@@ -1,0 +1,105 @@
+{% extends 'templates/document.twig' %}
+
+{% block title %}{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="/js/pickadate.js-3.6.2/lib/themes/default.css">
+<link rel="stylesheet" href="/js/pickadate.js-3.6.2/lib/themes/default.date.css">
+{% endblock %}
+
+{% block body %}
+<main>
+    <header>
+        <a class="navigation" href="{{ url_for('index') }}">
+            <i class="material-icons">arrow_back</i>
+        </a>
+        <h1>meubebê</h1>
+    </header>
+    <section id="add">
+        <form action="{{ url_for('baby.create') }}" method="POST">
+            <div class="form-group">
+                <label for="name">Nome</label>
+                <input type="text" class="form-control" name="name" id="name">
+            </div>
+            <div class="form-group">
+                <label for="description">Descrição</label>
+                <input type="text" class="form-control" name="description" id="description">
+            </div>
+            <div class="form-group">
+                <label for="dob">Dia do Nascimento</label>
+                <input type="text" class="form-control" name="born_at" id="born_at">
+            </div>
+            <div class="form-group">
+                <label for="">Gênero</label>
+                <span>
+                    <input type="radio" id="genderM" name="gender" value="M">
+                    <label for="genderM">Masculino</label>
+                    <br>
+                    <input type="radio" id="genderF" name="gender" value="F">
+                    <label for="genderF">Feminino</label>
+                    <br>
+                </span>
+            </div>
+            <div class="form-group">
+                <button type="submit">Adicionar</button>
+                <button type="reset">Limpar</button>
+            </div>
+        </form>
+    </section>
+</main>
+
+<script src="/js/pickadate.js-3.6.2/lib/picker.js"></script>
+<script src="/js/pickadate.js-3.6.2/lib/picker.date.js"></script>
+<script src="/js/pickadate.js-3.6.2/lib/legacy.js"></script>
+
+<script>
+    $(document).ready(function(){
+        
+        $('form').submit(function(e){
+            var formData = {
+                name: $("#name").val(),
+                description: $("#description").val(),
+                born_at: $("#born_at").val(),
+                gender: $("input[name='gender']:checked").val()
+            };
+
+            $.ajax({
+                type: "POST",
+                url: "{{ url_for('baby.create') }}",
+                data: formData,
+                dataType: "json",
+                encode: true,
+                beforeSend : function(){
+                    console.log("BeforeSend");
+                    // Show image container
+                    // $( ".spin-loader" ).show();
+                },
+            }).done(function (data) {
+                    // $("#task-title").val('');
+                    // updateTaskList();
+                    console.log(data);
+                    $('form').trigger('reset');
+            }).always(function(){
+                console.log("Always");
+                    // $( ".spin-loader" ).hide();
+            });
+
+            e.preventDefault();
+        });
+        
+        $('input#born_at').pickadate({
+            //format: 'You selecte!d: dddd, dd mmm, yyyy',
+            format: 'yyyy-mm-dd',
+            // formatSubmit: 'yyyy-mm-dd',
+            onClose: function(evt) {
+                $("#submit").focus(); 
+            },
+            onSet: function(evt) {
+                $("#submit").focus(); 
+            },
+        });
+
+    });
+</script>
+
+{% endblock %}

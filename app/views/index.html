@@ -1,0 +1,47 @@
+{% extends 'templates/document.twig' %}
+
+{% block title %}{% endblock %}
+
+{% block body %}
+<style>
+    header {
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    header a {
+        padding: .5rem;
+        display: block;
+    }
+</style>
+<main>
+    <header>
+        <h1>meubebê</h1>
+        <a href="{{ url_for('add') }}">
+            <i class="material-icons">add</i>
+        </a>
+    </header>
+    <ul class="baby-collection">
+    {% for b in babies %}
+    <li>
+        <a href="{{ url_for('baby.dashboard',{uuid: b.uuid }) }}">
+            <figure class="avatar">
+                <img src="/images/{{ b.uuid }}.png" onerror="this.onerror=null,this.src='/images/unknown.png'" alt="Imagem bebe">
+            </figure>
+            <span>
+                {{ b.name }}
+            </span>
+            <small>
+                {{ b.age }}
+            </small>
+        </a>
+    </li>
+    {% else%}
+    <p>You don't have any babies</p>
+    {% endfor %}
+    </ul>
+</main>
+
+{% endblock %}

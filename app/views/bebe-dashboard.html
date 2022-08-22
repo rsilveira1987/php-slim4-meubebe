@@ -1,0 +1,30 @@
+{% extends 'templates/document.twig' %}
+
+{% block title %} - Perfil{% endblock %}
+
+{% block body %}
+<main>
+    <header>
+        <a class="navigation" href="{{ url_for('index') }}">
+            <i class="material-icons">arrow_back</i>
+        </a>
+        <figure class="avatar">
+            <img src="/images/{{ baby.uuid }}.png" onerror="this.onerror=null,this.src='/images/unknown.png'" alt="Imagem bebe">
+        </figure>
+        <a href="{{ url_for('baby.edit',{uuid: baby.uuid}) }}" style="margin-left: auto;">
+            <i class="material-icons">edit</i>
+        </a>
+    </header>
+    <section>
+        <h1>{{ baby.name }}</h1>
+        <p>{{ baby.description }}</p>
+    </section>
+
+    <ul class="baby-actions">
+        <li>Sono</li>
+        <li>Amamentação</li>
+        <li>Compromissos</li>
+    </ul>
+</main>
+{% endblock %}
+

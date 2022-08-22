@@ -1,0 +1,29 @@
+{% extends 'templates/document.twig' %}
+
+{% block title %} - Remover{% endblock %}
+
+{% block body %}
+<main>
+    <header>
+        <a class="navigation" href="{{ url_for('baby.edit',{uuid: baby.uuid }) }}">
+            <i class="material-icons">arrow_back</i>
+        </a>
+        <figure class="avatar">
+            <img src="/images/{{ baby.uuid }}.png" onerror="this.onerror=null,this.src='/images/unknown.png'" alt="Imagem bebe">
+        </figure>
+    </header>
+    <section>
+        <h1>Remover</h1>
+        <form action="{{ url_for('baby.remove',{uuid: baby.uuid }) }}">
+            <p>Você tem certeza que deseja remover <b>{{ baby.name }}</b>?</p>
+            <div class="form-group">
+                <button type="submit" name="action" value="yes">Sim</button>
+                <button type="submit" name="action" value="no">Não</button>
+            </div>
+        </form>
+    </section>
+
+</main>
+
+{% endblock %}
+

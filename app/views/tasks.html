@@ -1,0 +1,13 @@
+<ul>
+    {% for t in tasks %}
+    <li class="{{ t.done ? 'checked' : 'unchecked' }}">
+        <div data-id="{{ t.id }}">
+            <i></i>
+            <span>{{ t.title }}</span>
+        </div>
+        <button type="button" class="btn-primary btn-delete" data-id="{{ t.id }}"></button>
+    </li>
+    {% else %}
+    <p style="text-align: center;">You don't have any task to do.</p>
+    {% endfor %}
+</ul>
