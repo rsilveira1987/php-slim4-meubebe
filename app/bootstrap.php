@@ -13,6 +13,7 @@
     $settings = [];
 
     define('ROOT',__DIR__);
+    define('UPLOAD_PATH', ROOT . '/public/images/profile');
 
     function UUID_v4($data = null) {
         // Generate 16 bytes (128 bits) of random data or use the data passed into the function.

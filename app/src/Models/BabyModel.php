@@ -16,45 +16,56 @@
         protected $gender;
         protected $born_at;
 
-        public function getname() {
+        public function getName() {
             return $this->name;
         }
 
-        public function setname($name) {
+        public function setName($name) {
             $this->name = $name;
         }
 
-        public function getdescription() {
+        public function getDescription() {
             return $this->description;
         }
 
-        public function setdescription($description) {
+        public function setDescription($description) {
             $this->description = $description;
         }
 
-        public function getgender() {
+        public function getGender() {
             return $this->gender;
         }
 
-        public function setgender($gender) {
+        public function setGender($gender) {
             if ($gender != BabyGender::MALE && $gender != BabyGender::FEMALE)
                 throw new AppException("Invalid gender");
             $this->gender = $gender;
         }
 
-        public function getborn_at() {
+        public function getBorn_At() {
             $dt = ($this->born_at) ? new DateTime($this->born_at) : null;
             return $dt;
         }
 
-        public function setborn_at($d) {
+        public function setBorn_At($d) {
             if (!DateUtils::isDateTimeValid($d))
                 throw new AppException("Invalid born_at date");
             $this->born_at = $d;
         }
 
+        public function isMale() {
+            return ($this->gender == BabyGender::MALE) ? true : false;
+        }
+
+        public function isFemale() {
+            return ($this->gender == BabyGender::FEMALE) ? true : false;
+        }
+
         public function getAge() {
-            return 'undefinned';
+            $years = $this->getAgeInYears();
+            // $months = $years % $this->getAgeInMonths();
+            // return "{$years} ano(s) e {$months} mes(es)";
+            return "{$years} ano(s)";
         }
 
         public function getAgeInMonths() {
@@ -82,6 +93,19 @@
             if (empty($this->gender)) return false;
             if (empty($this->born_at)) return false;
             return true;
+        }
+
+        public function toJson() {
+            return json_encode([
+                'id' => intval($this->id),
+                'uuid' => intval($this->uuid),
+                'name' => $this->name,
+                'description' => $this->description,
+                'gender' => $this->gender,
+                'born_at' => $this->born_at,
+                'created_at' => $this->created_at,
+                'updated_at' => $this->updated_at
+            ]);
         }
 
     }

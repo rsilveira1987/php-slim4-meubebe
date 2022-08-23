@@ -3,8 +3,7 @@
     namespace App\Dao;
 
     use App\Exceptions\AppException;
-use App\Models\BabyModel;
-use App\Models\BaseModel;
+    use App\Models\BabyModel;
     use App\Models\DB;
     use DateTime;
     use PDOException;
@@ -89,6 +88,30 @@ use App\Models\BaseModel;
 
                 return $object;
     
+            } catch(PDOException $e) {
+                die($e->getMessage());
+            } finally {
+                $db = null;
+            }
+        }
+
+        public static function retrieveAll() {
+            $model = new BabyModel;
+            // get model entity
+            $entity = $model->getEntity();
+
+            // build sql
+            $sql = "SELECT * FROM {$entity}";
+
+            try {
+                $db = new DB;
+                $pdo = $db->connect();
+                $stmt = $pdo->prepare($sql);
+                $stmt->setFetchMode(\PDO::FETCH_CLASS, get_class($model));
+                $stmt->execute();
+                $objects = $stmt->fetchAll();
+    
+                return $objects;
             } catch(PDOException $e) {
                 die($e->getMessage());
             } finally {

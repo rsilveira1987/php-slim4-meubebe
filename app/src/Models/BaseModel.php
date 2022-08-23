@@ -48,42 +48,41 @@
 			} else {
 				$this->$prop = $value;
 			}
-
 		}
 
-        public function getid() {
+        public function getID() {
             return $this->id;
         }
 
-        public function setid($id) {
+        public function setID($id) {
             $this->id = $id;
         }
 
-        public function getuuid() {
+        public function getUUID() {
             return $this->uuid;
         }
 
-        public function setuuid($uuid) {
+        public function setUUID($uuid) {
             $this->uuid = $uuid;
         }
 
-        public function getcreated_at() {
+        public function getCreated_At() {
             $d = ($this->created_at) ? new DateTime($this->created_at) : null;
             return $d;
         }
 
-        public function setcreated_at($d) {
+        public function setCreated_At($d) {
             if (!DateUtils::isDateTimeValid($d))
                 throw new AppException("Invalid created_at date");
             $this->created_at = $d;
         }
 
-        public function getupdated_at() {
+        public function getUpdated_At() {
             $d = ($this->updated_at) ? new DateTime($this->updated_at) : null;
             return $d;
         }
 
-        public function setupdated_at($d) {
+        public function setUpdated_At($d) {
             if (!DateUtils::isDateTimeValid($d))
                 throw new AppException("Invalid updated_at date");
             $this->updated_at = $d;
@@ -127,26 +126,4 @@
 		}
 
         abstract public function validate();
-
-        // public static function fromArray (array $data) {
-        //     $b = new Baby();
-        //     $b->setID($data['id'] ?? null);
-        //     $b->setUUID($data['uuid'] ?? null);
-        //     $b->setName($data['name'] ?? null);
-        //     $b->setDescription($data['description'] ?? null);
-        //     $b->setDayOfBirth($data['dob'] ?? null);
-        //     $b->setGender($data['gender'] ?? null);
-        //     return $b;
-        // }
-
-        // public function toArray() {
-        //     return [
-        //         'id' => $this->getID(),
-        //         'uuid' => $this->getUUID(),
-        //         'name' => $this->getName(),
-        //         'description' => $this->getDescription(),
-        //         'dob' => $this->getDayOfBirth(),
-        //         'gender' => $this->getGender()
-        //     ];
-        // }
     }

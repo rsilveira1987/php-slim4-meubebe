@@ -1,8 +1,10 @@
 {
     "require": {
-        "slim/slim": "^4.10",
-        "slim/psr7": "^1.5",
-        "slim/twig-view": "^3.3",
+        "ext-json": "*",
+        "php-di/php-di": "^6.0",
+        "slim/slim": "^4.8",
+        "slim/psr7": "^1.4",
+        "slim/twig-view": "^3.2",
         "selective/basepath": "^2.1"
     },
     "autoload": {

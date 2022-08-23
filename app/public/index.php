@@ -4,7 +4,8 @@
     use App\Dao\BabyModelDao;   
     use App\Exceptions\AppException;
     use App\Models\DB;
-    use Psr\Http\Message\ResponseInterface as Response;
+use App\Services\FileUploadService;
+use Psr\Http\Message\ResponseInterface as Response;
     use Psr\Http\Message\ServerRequestInterface as Request;
     use Selective\BasePath\BasePathMiddleware;
     use Slim\Views\Twig;
@@ -36,26 +37,30 @@
 
         $view = Twig::fromRequest($request);
 
-        $babies = [];
-        $sql = "SELECT * FROM tb_babies";
-        try {
-            $db = new DB;
-            $pdo = $db->connect();
-            $stmt = $pdo->prepare($sql);
-            $stmt->execute();
-            $babies = $stmt->fetchAll(PDO::FETCH_OBJ);
+        $babies = BabyModelDao::retrieveAll();
+        // $sql = "SELECT * FROM tb_babies";
+        // try {
+        //     $db = new DB;
+        //     $pdo = $db->connect();
+        //     $stmt = $pdo->prepare($sql);
+        //     $stmt->execute();
+        //     $babies = $stmt->fetchAll(PDO::FETCH_OBJ);
 
-            $response = $view->render($response, 'index.html', [
-                'babies' => $babies
-            ]);
+        //     $response = $view->render($response, 'index.html', [
+        //         'babies' => $babies
+        //     ]);
 
-        } catch(PDOException $e) {
-            $response = $view->render($response, 'templates/error.html', [
-                'message' => $e->getMessage()
-            ]);
-        } finally {
-            $db = null;
-        }
+        // } catch(PDOException $e) {
+        //     $response = $view->render($response, 'templates/error.html', [
+        //         'message' => $e->getMessage()
+        //     ]);
+        // } finally {
+        //     $db = null;
+        // }
+
+        $response = $view->render($response, 'index.html', [
+            'babies' => $babies
+        ]);
 
         return $response;
     })->setName('index');
@@ -79,83 +84,103 @@
         // return $response;
 
         // get URI attribute
-        $uuid = $request->getAttribute('uuid');
+        $uuid = $args['uuid'];
 
         // create twig object
         $view = Twig::fromRequest($request);    
 
-        try {
-            $db = new DB;
-            $pdo = $db->connect();
-            $sql = 'SELECT * FROM tb_babies WHERE uuid = :uuid';
-            $stmt = $pdo->prepare($sql);
-            $stmt->execute([
-                ':uuid' => $uuid
-            ]);
-            $baby = $stmt->fetchAll(PDO::FETCH_OBJ);
+        $target = BabyModelDao::retrieveByUUID($uuid);
 
-            if(empty($baby)) {
-                throw new AppException('Bebê não encontrado.');
-            }
+        // try {
+        //     $db = new DB;
+        //     $pdo = $db->connect();
+        //     $sql = 'SELECT * FROM tb_babies WHERE uuid = :uuid';
+        //     $stmt = $pdo->prepare($sql);
+        //     $stmt->execute([
+        //         ':uuid' => $uuid
+        //     ]);
+        //     $baby = $stmt->fetchAll(PDO::FETCH_OBJ);
 
-            $response = $view->render($response, 'bebe-dashboard.html', [
-                'baby' => $baby[0]
-            ]);
+        //     if(empty($baby)) {
+        //         throw new AppException('Bebê não encontrado.');
+        //     }
 
-        } catch(PDOException $e) {
-            $response = $view->render($response, 'templates/error.html', [
-                'message' => $e->getMessage()
-            ]);
-        } catch(AppException $e) {
-            $response = $view->render($response, 'templates/error.html', [
-                'message' => $e->getMessage()
-            ]);
-        }
-        finally {
-            $db = null;
-        }
+        //     $response = $view->render($response, 'bebe-dashboard.html', [
+        //         'baby' => $baby[0]
+        //     ]);
+
+        // } catch(PDOException $e) {
+        //     $response = $view->render($response, 'templates/error.html', [
+        //         'message' => $e->getMessage()
+        //     ]);
+        // } catch(AppException $e) {
+        //     $response = $view->render($response, 'templates/error.html', [
+        //         'message' => $e->getMessage()
+        //     ]);
+        // }
+        // finally {
+        //     $db = null;
+        // }
+
+        $response = $view->render($response, 'bebe-dashboard.html', [
+            'baby' => $target
+        ]);
 
         return $response;
     })->setName('baby.dashboard');
 
     $app->get('/meu-bebe/{uuid}/editar', function (Request $request, Response $response, array $args) {
         
-        // get URI attribute
-        $uuid = $request->getAttribute('uuid');
+        // get URI argument
+        $uuid = $args['uuid'];
 
         // create twig object
-        $view = Twig::fromRequest($request);    
-
+        $view = Twig::fromRequest($request);
+        
         try {
-            $db = new DB;
-            $pdo = $db->connect();
-            $sql = 'SELECT * FROM tb_babies WHERE uuid = :uuid';
-            $stmt = $pdo->prepare($sql);
-            $stmt->execute([
-                ':uuid' => $uuid
-            ]);
-            $baby = $stmt->fetchAll(PDO::FETCH_OBJ);
 
-            if(empty($baby)) {
-                throw new AppException('Bebê não encontrado.');
-            }
-
+            $target = BabyModelDao::retrieveByUUID($uuid);
+            
             $response = $view->render($response, 'bebe-editar.html', [
-                'baby' => $baby[0]
+                'baby' => $target
             ]);
 
-        } catch(PDOException $e) {
-            $response = $view->render($response, 'templates/error.html', [
-                'message' => $e->getMessage()
-            ]);
-        } catch(AppException $e) {
+        } catch(Exception $e) {
             $response = $view->render($response, 'templates/error.html', [
                 'message' => $e->getMessage()
             ]);
         }
-        finally {
-            $db = null;
-        }
+
+        // try {
+        //     $db = new DB;
+        //     $pdo = $db->connect();
+        //     $sql = 'SELECT * FROM tb_babies WHERE uuid = :uuid';
+        //     $stmt = $pdo->prepare($sql);
+        //     $stmt->execute([
+        //         ':uuid' => $uuid
+        //     ]);
+        //     $baby = $stmt->fetchAll(PDO::FETCH_OBJ);
+
+        //     if(empty($baby)) {
+        //         throw new AppException('Bebê não encontrado.');
+        //     }
+
+        //     $response = $view->render($response, 'bebe-editar.html', [
+        //         'baby' => $baby[0]
+        //     ]);
+
+        // } catch(PDOException $e) {
+        //     $response = $view->render($response, 'templates/error.html', [
+        //         'message' => $e->getMessage()
+        //     ]);
+        // } catch(AppException $e) {
+        //     $response = $view->render($response, 'templates/error.html', [
+        //         'message' => $e->getMessage()
+        //     ]);
+        // }
+        // finally {
+        //     $db = null;
+        // }
 
         return $response;
     })->setName('baby.edit');
@@ -171,11 +196,26 @@
                 $object = BabyModelDao::retrieveByUUID($uuid);
                 $object->name = $params['name'];
                 $object->description = $params['description'];
+                $object->born_at = $params['born_at'];
+                $object->gender = $params['gender'];
                 $object = BabyModelDao::update($object);
                 // redirect
                 $routeParser = RouteContext::fromRequest($request)->getRouteParser();
                 $url = $routeParser->urlFor('baby.edit',['uuid'=>$uuid]);
                 $response = $response->withHeader('Location', $url)->withStatus(302);
+                break;
+            case 'upload':
+                $directory = UPLOAD_PATH;
+                $uploadedFiles = $request->getUploadedFiles();
+
+                // handle single input with single file upload
+                $uploadedFile = $uploadedFiles['avatar'];
+                if ($uploadedFile->getError() === UPLOAD_ERR_OK) {
+                    $service = new FileUploadService($uploadedFile);
+                    $service->setFilename($uuid);
+                    $filename = $service->moveUploadedFileTo($directory);
+                    $response->getBody()->write('Uploaded: ' . $filename . '<br/>');
+                }
                 break;
             default:
                 break;
