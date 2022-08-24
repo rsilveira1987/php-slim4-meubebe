@@ -1,4 +1,5 @@
 {% extends 'templates/document.twig' %}
+{% import "templates/macros.twig" as macros %}
 
 {% block title %}{% endblock %}
 
@@ -9,6 +10,10 @@
         flex-flow: row nowrap;
         justify-content: space-between;
         align-items: center;
+    }
+
+    header h1 {
+        margin: 0;
     }
 
     header a {
@@ -24,17 +29,18 @@
         </a>
     </header>
     <ul class="baby-collection">
-    {% for b in babies %}
+    {% for baby in babies %}
     <li>
-        <a href="{{ url_for('baby.dashboard',{uuid: b.uuid }) }}">
+        <a href="{{ url_for('baby.dashboard',{uuid: baby.uuid }) }}">
             <figure class="avatar">
-                <img src="/images/{{ b.uuid }}.png" onerror="this.onerror=null,this.src='/images/unknown.png'" alt="Imagem bebe">
+                {% set filename = baby.uuid ~ '.png' %}
+                {{ macros.avatar(filename) }}
             </figure>
             <span>
-                {{ b.name }}
+                {{ baby.name }}
             </span>
             <small>
-                {{ b.getAge() }}
+                {{ baby.getAge() }}
             </small>
         </a>
     </li>

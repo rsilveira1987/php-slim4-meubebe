@@ -1,4 +1,5 @@
 {% extends 'templates/document.twig' %}
+{% import "templates/macros.twig" as macros %}
 
 {% block title %} - Perfil{% endblock %}
 
@@ -9,7 +10,8 @@
             <i class="material-icons">arrow_back</i>
         </a>
         <figure class="avatar">
-            <img src="/images/{{ baby.uuid }}.png" onerror="this.onerror=null,this.src='/images/unknown.png'" alt="Imagem bebe">
+            {% set filename = baby.uuid ~ '.png' %}
+            {{ macros.avatar(filename) }}
         </figure>
         <a href="{{ url_for('baby.edit',{uuid: baby.uuid}) }}" style="margin-left: auto;">
             <i class="material-icons">edit</i>
@@ -25,7 +27,11 @@
         <li>Leite</li>
         <li>Sono</li>
         <li>Fralda</li>
-        <li>Compromissos</li>
+        <li>
+            <a href="{{ url_for('baby.appointments',{uuid: baby.uuid}) }}">
+                Compromissos
+            </a>
+        </li>
     </ul>
 </main>
 {% endblock %}

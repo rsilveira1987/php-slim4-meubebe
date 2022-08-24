@@ -86,10 +86,13 @@
                 
                 $object = $stmt->fetchObject(get_class($model));
 
+                if(!$object)
+                    throw new \App\Exceptions\AppException('UUID Nao encontrado.');
+
                 return $object;
     
             } catch(PDOException $e) {
-                die($e->getMessage());
+                throw $e;
             } finally {
                 $db = null;
             }
@@ -119,7 +122,7 @@
             }
         }
 
-        public static function update(BabyModel $model) {            
+        public static function update(\App\Models\BaseModel $model) {
             // get model entity
 			$entity = $model->getEntity();
 			
@@ -146,9 +149,10 @@
 			$sql = "UPDATE {$entity} SET {$placeholdersList} WHERE id = :id";
 
             try {
-
+                
+                // Validate model
                 if(!$model->validate())
-                    throw new AppException('Invalid object data.');
+                    throw new AppException('Invalid model data.');
 
                 $db = new DB;
                 $pdo = $db->connect();
@@ -159,7 +163,7 @@
                 return self::retrieveByID($model->id);
     
             } catch(PDOException $e) {
-                die($e->getMessage());
+                throw $e;
             } finally {
                 $db = null;
             }			

@@ -140,6 +140,15 @@ input.form-control {
     width: 100%;
 }
 
+/* Buttons */
+button.btn {
+    cursor: pointer;
+}
+
+button.btn-block {
+    width: 100%;
+}
+
 @media screen and (min-width: 768px) {
    
 }

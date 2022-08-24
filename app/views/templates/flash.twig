@@ -1,0 +1,45 @@
+{% if flash.getMessages() %}
+<div class="ui flash-container" id="flash">
+    {% for name, messages in flash.getMessages() %}
+        <div class="ui {{ name }} flash-message">
+            <button type="button" class="flash-close flash-exit">
+                <i class="material-icons">close</i>
+            </button>
+            {% for message in messages %}
+                <p>{{ message }}</p>
+            {% endfor %}
+            <button type="button" class="btn btn-block flash-exit">
+                OK
+            </button>
+        </div>
+    {% endfor %}
+</div>
+<script>
+
+    const flash = document.getElementById('flash');
+    flash.classList.add('open');
+    const exits = flash.querySelectorAll('.flash-exit');
+    exits.forEach(function(exit){
+        exit.addEventListener('click',function(event){
+            event.preventDefault();
+            flash.classList.remove('open');
+        });
+    });
+
+
+{# flashes.forEach(function(trigger){
+    trigger.addEventListener('click',function(event){
+        event.preventDefault();
+        const modal = document.getElementById(trigger.dataset.modal);
+        modal.classList.add('modal-open');
+        const exits = modal.querySelectorAll('.modal-exit');
+        exits.forEach(function(exit){
+            exit.addEventListener('click',function(event){
+                event.preventDefault();
+                modal.classList.remove('modal-open');
+            });
+        });
+    });
+}); #}
+</script>
+{% endif %}

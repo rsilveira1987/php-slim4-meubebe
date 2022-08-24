@@ -5,7 +5,8 @@
         "slim/slim": "^4.8",
         "slim/psr7": "^1.4",
         "slim/twig-view": "^3.2",
-        "selective/basepath": "^2.1"
+        "selective/basepath": "^2.1",
+        "slim/flash": "^0.4.0"
     },
     "autoload": {
         "psr-4": {

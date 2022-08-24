@@ -13,6 +13,7 @@ return array(
     'Symfony\\Polyfill\\Ctype\\' => array($vendorDir . '/symfony/polyfill-ctype'),
     'Slim\\Views\\' => array($vendorDir . '/slim/twig-view/src'),
     'Slim\\Psr7\\' => array($vendorDir . '/slim/psr7/src'),
+    'Slim\\Flash\\' => array($vendorDir . '/slim/flash/src'),
     'Slim\\' => array($vendorDir . '/slim/slim/Slim'),
     'Selective\\BasePath\\' => array($vendorDir . '/selective/basepath/src'),
     'Psr\\Log\\' => array($vendorDir . '/psr/log/Psr/Log'),

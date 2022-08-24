@@ -6,14 +6,22 @@
     // Should be set to 0 in production
     error_reporting(E_ALL);
 
+    // Constantes
+    define('ROOT',__DIR__);
+    define('UPLOAD_PATH', ROOT . '/public/images/profile');
+    
     // Should be set to '0' in production
     ini_set('display_errors', '1');
 
     // Settings
     $settings = [];
 
-    define('ROOT',__DIR__);
-    define('UPLOAD_PATH', ROOT . '/public/images/profile');
+    //-------------------------------------------------------------------------
+    // Iniciar sessao
+    //-------------------------------------------------------------------------
+    //session_save_path( WWWROOT . '/php_session');  // define this path to show the 'session issue'
+    new \App\Utils\Session;
+
 
     function UUID_v4($data = null) {
         // Generate 16 bytes (128 bits) of random data or use the data passed into the function.

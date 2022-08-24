@@ -1,0 +1,85 @@
+{% extends 'templates/document.twig' %}
+{% import "templates/macros.twig" as macros %}
+
+{% block title %}Compromissos{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="/libs/mcdatepicker/dist/mc-calendar.min.css" />
+{% endblock %}
+
+{% block body %}
+<style>
+    section header {
+        margin: 0;
+        padding: 0;
+        margin-bottom: 2rem;
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: space-between;
+        border-bottom: 1px solid var(--black10);
+    }
+</style>
+<main>
+    <header>
+        <a class="navigation" href="{{ url_for('baby.dashboard',{uuid: baby.uuid }) }}">
+            <i class="material-icons">arrow_back</i>
+        </a>
+        <figure class="avatar">
+            {% set filename = baby.uuid ~ '.png' %}
+            {{ macros.avatar(filename) }}
+        </figure>
+        <a href="#" style="margin-left: auto;">Adicionar Compromisso</a>
+    </header>
+    <section>
+        <header>
+            <h2>Compromissos</h2>
+            <!-- <a class="btn btn-primary" href="{{ url_for('baby.remove',{uuid: baby.uuid }) }}">Remover</a> -->
+            <!-- <button type="button" class="btn-primary" id="btn-remover" data-uri="">Remover</button> -->
+        </header>
+
+        <!-- <form action="" method="POST">
+            <div class="form-group">
+                <label for="">Nome</label>
+                <input type="text" name="name" value="{{ baby.name }}">
+            </div>
+            <div class="form-group">
+                <label for="">Descrição</label>
+                <input type="text" name="description" value="{{ baby.description }}">
+            </div>
+            <div class="form-group">
+                <label for="">Data de Nascimento</label>
+                <input type="text" name="born_at" id="born_at" value="{{ baby.born_at | date('Y-m-d') }}">
+            </div>
+            <div class="form-group">
+                <label for="">Gênero</label>
+                <span>
+                    <label for="">
+                        <input type="radio" name="gender" value="M" {{ baby.isMale() ? 'checked' : '' }}>
+                        Masculino
+                    </label>
+                    <label for="">
+                        <input type="radio" name="gender" value="F" {{ baby.isFemale() ? 'checked' : '' }}>
+                        Feminino
+                    </label>
+                </span>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn-primary" name="action" value="update">Salvar</button>
+            </div>
+        </form> -->
+    </section>
+</main>
+<script src="/libs/mcdatepicker/dist/mc-calendar.min.js"></script>
+<script>
+
+    const myDatePicker = MCDatepicker.create({ 
+        el: '#born_at',
+        bodyType: 'modal',
+        dateFormat: 'YYYY-mm-dd',
+        showCalendarDisplay: false,
+        closeOnBlur: true,
+    });
+
+</script>
+{% endblock %}
+

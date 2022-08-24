@@ -1,4 +1,5 @@
 {% extends 'templates/document.twig' %}
+{% import "templates/macros.twig" as macros %}
 
 {% block title %} - Remover{% endblock %}
 
@@ -9,11 +10,12 @@
             <i class="material-icons">arrow_back</i>
         </a>
         <figure class="avatar">
-            <img src="/images/{{ baby.uuid }}.png" onerror="this.onerror=null,this.src='/images/unknown.png'" alt="Imagem bebe">
+            {% set filename = baby.uuid ~ '.png' %}
+            {{ macros.avatar(filename) }}
         </figure>
     </header>
     <section>
-        <h1>Remover</h1>
+        <h2>Remover</h2>
         <form action="{{ url_for('baby.remove',{uuid: baby.uuid }) }}">
             <p>Você tem certeza que deseja remover <b>{{ baby.name }}</b>?</p>
             <div class="form-group">

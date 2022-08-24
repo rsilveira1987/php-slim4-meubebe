@@ -29,6 +29,7 @@ class ComposerStaticInit8d966e48bd22f6146819fc705fec5097
             'Symfony\\Polyfill\\Ctype\\' => 23,
             'Slim\\Views\\' => 11,
             'Slim\\Psr7\\' => 10,
+            'Slim\\Flash\\' => 11,
             'Slim\\' => 5,
             'Selective\\BasePath\\' => 19,
         ),
@@ -91,6 +92,10 @@ class ComposerStaticInit8d966e48bd22f6146819fc705fec5097
         'Slim\\Psr7\\' => 
         array (
             0 => __DIR__ . '/..' . '/slim/psr7/src',
+        ),
+        'Slim\\Flash\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/slim/flash/src',
         ),
         'Slim\\' => 
         array (

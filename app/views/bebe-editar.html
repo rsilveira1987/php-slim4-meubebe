@@ -1,9 +1,11 @@
 {% extends 'templates/document.twig' %}
+{% import "templates/macros.twig" as macros %}
 
-{% block title %} - Perfil{% endblock %}
+{% block title %}Perfil{% endblock %}
 
 {% block css %}
 <link rel="stylesheet" href="/libs/mcdatepicker/dist/mc-calendar.min.css" />
+<link rel="stylesheet" href="/css/flash.css" />
 {% endblock %}
 
 {% block body %}
@@ -24,14 +26,15 @@
             <i class="material-icons">arrow_back</i>
         </a>
         <figure class="avatar">
-            <img src="/images/{{ baby.uuid }}.png" onerror="this.onerror=null,this.src='/images/unknown.png'" alt="Imagem bebe">
+            {% set filename = baby.uuid ~ '.png' %}
+            {{ macros.avatar(filename) }}
         </figure>
+        <button type="button" class="btn-primary" data-modal="modal-one" style="margin-left: auto;">Remover</button>
     </header>
+    {% include "templates/flash.twig" %}
     <section>
         <header>
             <h2>Informações</h2>
-            <a class="btn btn-primary" href="{{ url_for('baby.remove',{uuid: baby.uuid }) }}">Remover</a>
-            <!-- <button type="button" class="btn-primary" id="btn-remover" data-uri="">Remover</button> -->
         </header>
 
         <form action="" method="POST">
@@ -89,8 +92,95 @@
     </section>
 
 </main>
+<style>
+    .modal {
+        padding: 2rem;
+        position: fixed;
+        width: 100vw;
+        height: 100vh;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+        top: 0;
+        left: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(0, 0, 0, .6);
+    }
+    .modal h2,
+    .modal p {
+        margin: 0;
+    }
+    .modal-open {
+        visibility: visible;
+        opacity: 1;
+        transition-delay: 0s;
+    }
+    .dialog {
+        border-radius: 5px;
+        position: relative;
+        background-color: #FFFFFF;
+        padding: 2rem;
+    }
+    .modal-close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        outline: none;
+        appearance: none;
+        color: inherit;
+        background: none;
+        border: 0px;
+        font-weight: bold;
+        cursor: pointer;
+        font-size: 1.25rem;
+    }
+    .modal .btn-group {
+        margin-top: 16px;
+        display: flex;
+        flex-flow: row nowrap;
+        gap: 16px;
+    }
+
+    .modal .btn-group button {
+        width: 100%;
+    }
+
+</style>
+<div class="modal" id="modal-one">
+    <div class="dialog">
+        <button type="button" class="modal-close modal-exit">
+            <i class="material-icons">close</i>
+        </button>
+        <form action="{{ url_for('baby.remove',{uuid: baby.uuid }) }}" method="POST">
+        <h2>Remover</h2>
+        <p>Atenção: Você ter certeza que deseja remover <strong>{{ baby.name }}</strong>?</p>
+        <div class="btn-group">
+            <button class="btn" type="submit" name="action" value="remove">Sim</button>
+            <button class="btn modal-exit" type="button">Não</button>
+        </div>
+        </form>
+    </div>
+</div>
 <script src="/libs/mcdatepicker/dist/mc-calendar.min.js"></script>
 <script>
+
+    const modals = document.querySelectorAll('[data-modal]');
+    modals.forEach(function(trigger){
+        trigger.addEventListener('click',function(event){
+            event.preventDefault();
+            const modal = document.getElementById(trigger.dataset.modal);
+            modal.classList.add('modal-open');
+            const exits = modal.querySelectorAll('.modal-exit');
+            exits.forEach(function(exit){
+                exit.addEventListener('click',function(event){
+                    event.preventDefault();
+                    modal.classList.remove('modal-open');
+                });
+            });
+        });
+    });
 
     const myDatePicker = MCDatepicker.create({ 
         el: '#born_at',
@@ -98,7 +188,17 @@
         dateFormat: 'YYYY-mm-dd',
         showCalendarDisplay: false,
         closeOnBlur: true,
+        theme: {
+            theme_color: '#EA882E'
+        }
     });
+
+    // $(document).ready(function(){
+    //     $('#btn-remover').on('click',function(e){
+    //         console.log('clicked');
+    //         $('.modal-wrapper').modal('toggle');
+    //     }); 
+    // });
 
 </script>
 {% endblock %}

@@ -1,11 +1,10 @@
 <?php
 
-
     use App\Dao\BabyModelDao;   
     use App\Exceptions\AppException;
     use App\Models\DB;
-use App\Services\FileUploadService;
-use Psr\Http\Message\ResponseInterface as Response;
+    use App\Services\FileUploadService;
+    use Psr\Http\Message\ResponseInterface as Response;
     use Psr\Http\Message\ServerRequestInterface as Request;
     use Selective\BasePath\BasePathMiddleware;
     use Slim\Views\Twig;
@@ -13,16 +12,38 @@ use Psr\Http\Message\ResponseInterface as Response;
     use Slim\Factory\AppFactory;
     use Slim\Routing\RouteCollectorProxy;
     use Slim\Routing\RouteContext;
+    use DI\Container;
 
     require __DIR__ . '/../bootstrap.php';
 
-    // Instantiate app
+    // Create Container using PHP-DI
+    $container = new Container();
+
+    $container->set(App\Controllers\BabyController::class, function () use ($container) {
+        return new App\Controllers\BabyController($container);
+    });
+
+    $container->set(App\Controllers\AppointmentController::class, function () use ($container) {
+        return new App\Controllers\AppointmentController($container);
+    });
+
+    $container->set('flash', function () {
+        return new Slim\Flash\Messages();
+    });
+
+    // Instantiate app with container
+    AppFactory::setContainer($container);
     $app = AppFactory::create();
 
     // Add Twig-View Middleware
     $twig = Twig::create(__DIR__ . '/../views/', ['cache' => false]);
+    // Add global variables
+    $environment = $twig->getEnvironment();
+    //$environment->addGlobal('flash', $container->get(Messages::class));
+    $environment->addGlobal('flash', $container->get('flash'));
     $app->add(TwigMiddleware::create($app, $twig));
 
+    // Middlewares
     $app->addBodyParsingMiddleware();
     $app->addRoutingMiddleware();
     $app->add(new BasePathMiddleware($app));
@@ -79,221 +100,11 @@ use Psr\Http\Message\ResponseInterface as Response;
         return $view->render($response,'add.html');
     })->setName('add');
 
-    $app->get('/meu-bebe/{uuid}/painel', function (Request $request, Response $response, array $args) {
-        // $response->getBody()->write('Hello World');
-        // return $response;
-
-        // get URI attribute
-        $uuid = $args['uuid'];
-
-        // create twig object
-        $view = Twig::fromRequest($request);    
-
-        $target = BabyModelDao::retrieveByUUID($uuid);
-
-        // try {
-        //     $db = new DB;
-        //     $pdo = $db->connect();
-        //     $sql = 'SELECT * FROM tb_babies WHERE uuid = :uuid';
-        //     $stmt = $pdo->prepare($sql);
-        //     $stmt->execute([
-        //         ':uuid' => $uuid
-        //     ]);
-        //     $baby = $stmt->fetchAll(PDO::FETCH_OBJ);
-
-        //     if(empty($baby)) {
-        //         throw new AppException('Bebê não encontrado.');
-        //     }
-
-        //     $response = $view->render($response, 'bebe-dashboard.html', [
-        //         'baby' => $baby[0]
-        //     ]);
-
-        // } catch(PDOException $e) {
-        //     $response = $view->render($response, 'templates/error.html', [
-        //         'message' => $e->getMessage()
-        //     ]);
-        // } catch(AppException $e) {
-        //     $response = $view->render($response, 'templates/error.html', [
-        //         'message' => $e->getMessage()
-        //     ]);
-        // }
-        // finally {
-        //     $db = null;
-        // }
-
-        $response = $view->render($response, 'bebe-dashboard.html', [
-            'baby' => $target
-        ]);
-
-        return $response;
-    })->setName('baby.dashboard');
-
-    $app->get('/meu-bebe/{uuid}/editar', function (Request $request, Response $response, array $args) {
-        
-        // get URI argument
-        $uuid = $args['uuid'];
-
-        // create twig object
-        $view = Twig::fromRequest($request);
-        
-        try {
-
-            $target = BabyModelDao::retrieveByUUID($uuid);
-            
-            $response = $view->render($response, 'bebe-editar.html', [
-                'baby' => $target
-            ]);
-
-        } catch(Exception $e) {
-            $response = $view->render($response, 'templates/error.html', [
-                'message' => $e->getMessage()
-            ]);
-        }
-
-        // try {
-        //     $db = new DB;
-        //     $pdo = $db->connect();
-        //     $sql = 'SELECT * FROM tb_babies WHERE uuid = :uuid';
-        //     $stmt = $pdo->prepare($sql);
-        //     $stmt->execute([
-        //         ':uuid' => $uuid
-        //     ]);
-        //     $baby = $stmt->fetchAll(PDO::FETCH_OBJ);
-
-        //     if(empty($baby)) {
-        //         throw new AppException('Bebê não encontrado.');
-        //     }
-
-        //     $response = $view->render($response, 'bebe-editar.html', [
-        //         'baby' => $baby[0]
-        //     ]);
-
-        // } catch(PDOException $e) {
-        //     $response = $view->render($response, 'templates/error.html', [
-        //         'message' => $e->getMessage()
-        //     ]);
-        // } catch(AppException $e) {
-        //     $response = $view->render($response, 'templates/error.html', [
-        //         'message' => $e->getMessage()
-        //     ]);
-        // }
-        // finally {
-        //     $db = null;
-        // }
-
-        return $response;
-    })->setName('baby.edit');
-
-    $app->post('/meu-bebe/{uuid}/editar', function (Request $request, Response $response, array $args) {
-        // get URI attribute
-        $uuid = $request->getAttribute('uuid');
-
-        $params = $request->getParsedBody();
-
-        switch($params['action']) {
-            case 'update':
-                $object = BabyModelDao::retrieveByUUID($uuid);
-                $object->name = $params['name'];
-                $object->description = $params['description'];
-                $object->born_at = $params['born_at'];
-                $object->gender = $params['gender'];
-                $object = BabyModelDao::update($object);
-                // redirect
-                $routeParser = RouteContext::fromRequest($request)->getRouteParser();
-                $url = $routeParser->urlFor('baby.edit',['uuid'=>$uuid]);
-                $response = $response->withHeader('Location', $url)->withStatus(302);
-                break;
-            case 'upload':
-                $directory = UPLOAD_PATH;
-                $uploadedFiles = $request->getUploadedFiles();
-
-                // handle single input with single file upload
-                $uploadedFile = $uploadedFiles['avatar'];
-                if ($uploadedFile->getError() === UPLOAD_ERR_OK) {
-                    $service = new FileUploadService($uploadedFile);
-                    $service->setFilename($uuid);
-                    $filename = $service->moveUploadedFileTo($directory);
-                    $response->getBody()->write('Uploaded: ' . $filename . '<br/>');
-                }
-                break;
-            default:
-                break;
-        }
-
-        return $response;
-
-        // try {
-        //     $params = $request->getParsedBody();
-
-        //     $object = BabyModelDao::retrieveByUUID($uuid);
-        //     $object->name = $params['name'];
-        //     $object->description = $params['description'];
-
-        //     $object = BabyModelDao::update($object);
-
-        //     // redirect
-        //     $routeParser = RouteContext::fromRequest($request)->getRouteParser();
-        //     $url = $routeParser->urlFor('baby.edit',['uuid'=>$uuid]);
-        //     return $response->withHeader('Location', $url)->withStatus(302);
-        // } catch(Exception $e) {
-        //     // create twig object
-        //     $view = Twig::fromRequest($request);
-
-        //     $response = $view->render($response, 'templates/error.html', [
-        //         'message' => $e->getMessage()
-        //     ]);
-        // }
-
-    })->setName('baby.edit');
-
-    $app->get('/meu-bebe/{uuid}/remover', function (Request $request, Response $response, array $args) {
-
-        // create twig object
-        $view = Twig::fromRequest($request);    
-
-        // get URI attribute
-        $uuid = $request->getAttribute('uuid');
-
-        $queryParams = $request->getQueryParams();
-        switch($queryParams['action'] ?? null) {
-            case 'no':
-                $routeParser = RouteContext::fromRequest($request)->getRouteParser();
-                $url = $routeParser->urlFor('baby.dashboard',['uuid'=>$uuid]);
-                return $response->withHeader('Location', $url)->withStatus(302);
-                break;
-            case 'yes':
-                $rc = BabyModelDao::delete($uuid);
-                $routeParser = RouteContext::fromRequest($request)->getRouteParser();
-                $url = $routeParser->urlFor('index',[]);
-                return $response->withHeader('Location', $url)->withStatus(302);
-                break;
-            default:
-                break;
-        }        
-
-        // Carregar a pagina
-        try {
-            $object = BabyModelDao::retrieveByUUID($uuid);
-            if ($object === false)
-                throw new AppException('Bebe nao encontrado.');
-
-            $response = $view->render($response, 'bebe-remover.html', [
-                'baby' => $object
-            ]);
-        } catch(Exception $e) {
-            $response = $view->render($response, 'templates/error.html', [
-                'message' => $e->getMessage()
-            ]);
-        }
-
-        return $response;
-    })->setName('baby.remove');
-
-    $app->post('/meu-bebe/{uuid}/remover', function (Request $request, Response $response, array $args) {
-        $params = $request->getParsedBody();
-        var_dump($params);
-    })->setName('baby.remove');
+    $app->get('/meu-bebe/{uuid}/painel', App\Controllers\BabyController::class . ':dashboardGet')->setName('baby.dashboard');
+    $app->get('/meu-bebe/{uuid}/editar', App\Controllers\BabyController::class . ':editGet')->setName('baby.edit');
+    $app->post('/meu-bebe/{uuid}/editar', App\Controllers\BabyController::class . ':editPost')->setName('baby.edit');
+    $app->post('/meu-bebe/{uuid}/remover', App\Controllers\BabyController::class . ':deletePost')->setName('baby.remove');
+    
 
     $app->group('/api/v1/', function (RouteCollectorProxy $group) {        
         // Criar um novo baby
@@ -322,6 +133,8 @@ use Psr\Http\Message\ResponseInterface as Response;
         // })->setName('baby.delete');
 
     });
+
+    $app->get('/meu-bebe/{uuid}/compromissos',App\Controllers\AppointmentController::class . ':view')->setName('baby.appointments');
 
     // $app->get('/tasks', function (Request $request, Response $response, array $args) {
        

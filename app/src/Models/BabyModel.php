@@ -63,9 +63,9 @@
 
         public function getAge() {
             $years = $this->getAgeInYears();
-            // $months = $years % $this->getAgeInMonths();
+            $months = ($years > 0) ? $this->getAgeInMonths() % $years : $this->getAgeInMonths();
             // return "{$years} ano(s) e {$months} mes(es)";
-            return "{$years} ano(s)";
+            return "{$years} ano(s) e {$months} mes(es)";
         }
 
         public function getAgeInMonths() {
